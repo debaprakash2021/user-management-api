@@ -1,9 +1,14 @@
 import { users } from '../data/user.js';
+import { createUserService } from '../services/user.services.js';
+
 
 export const getUsers = (req, res) => {
+    const {token} = req.headers;
+    console.log("Token from header:", token);
     try{
         res.status(200).json({
             success: true,
+            count: users.length,
             data: users
         });
         
@@ -22,9 +27,11 @@ export const getUsers = (req, res) => {
 export const createUser = (req, res) => {
     try{
         const { name, age, email } = req.body;
-        if(!name || !age || !email){
+        const userBody = createUserService(name, email, age);
+        
+        if(!userBody.success){
             return res.status(400).json({
-                 message: "Name, age, and email are required."
+                 message: userBody.message
                  });
         }
         const newUser = {
@@ -98,6 +105,31 @@ export const updateUser = (req, res) => {
         res.status(500).json({
             success: false,
             message: "User Not Found"
+        });
+    }
+}
+
+//getuser by id
+
+export const getUserById = (req, res) => {
+    try{
+        const { id } = req.params;
+        const user = users.find(u => u.id === id);
+        if(!user){
+            return res.status(404).json({
+                success: false,
+                message: "User Not Found"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: user
+        });
+    }
+    catch(error){
+        res.status(500).json({
+            success: false,
+            message: error.message
         });
     }
 }
