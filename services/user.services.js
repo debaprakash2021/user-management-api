@@ -27,7 +27,7 @@ export const createUserService = (name, email, age) => {
     }
 }
 
-export const deleteUser = (id) => {
+export const deleteUserService = (id) => {
     try{
         const userIndex = users.findIndex(u => u.id === id);
         if(userIndex === -1){

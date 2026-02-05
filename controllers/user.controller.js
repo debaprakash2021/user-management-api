@@ -1,5 +1,5 @@
 import { users } from '../data/user.js';
-import { createUserService } from '../services/user.services.js';
+import { createUserService , deleteUserService} from '../services/user.services.js';
 
 
 export const getUsers = (req, res) => {
