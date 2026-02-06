@@ -158,3 +158,14 @@ export const isActive = async (req,res)=>{
     data: users
   });
 }
+
+
+export const updateUserByEmail = async (req,res)=>{
+    const {email,updateUser} = req.body;
+    const user = await findByEmailAndUpdate(email, updateUser);  // Assuming email is unique and used to find the user to update
+
+  res.json({
+    success: true,
+    data: user
+  });
+}

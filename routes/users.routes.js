@@ -5,7 +5,8 @@ import {
   updateUser,
   deleteUser,
   patchUser,
-  isActive
+  isActive,
+  updateUserByEmail
 } from "../controllers/user.controller.js";
 
 
@@ -17,8 +18,9 @@ const router = express.Router();
 
 router.get("/", getUsers);
 router.post("/", createUser);
-router.get("/",isActive)
+router.get("/isactive",isActive);
 router.patch("/:id",patchUser);
+router.patch("/byEmail",updateUserByEmail);
 router.delete("/:id", deleteUser);
 
 export default router;

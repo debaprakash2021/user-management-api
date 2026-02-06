@@ -2,6 +2,10 @@
 import { email } from "zod";
 import { users } from "../data/users.js";
 import User from "../models/user.js"
+
+
+
+
 export const deleteUserService = (id) => {
   const index = users.findIndex(u => u.id === id);
 
@@ -54,4 +58,16 @@ export const updateUserService =async(id,data)=>{
 
    )
    return updateData;
+}
+
+export const findByEmailAndUpdate = async(email,data)=>{
+  const updateData  = await User.findOneAndUpdate(
+    {email:email},
+    {$set:data},
+    {
+      new:true,
+      runValidators: true
+    }
+  );
+  return updateData;
 }
