@@ -128,10 +128,10 @@ export const deleteUser = (req, res) => {
 //   res.status(204).send();
 // };
 
-export const createUser = (req, res) => {
+export const createUser = async (req, res) => {
   const {email,name,password,role}=req.body;
   
-  const userBody = createUserService(name,email,password,role);
+  const userBody =await createUserService(name,email,password,role);
   
   res.status(201).json({
     success: true,
@@ -147,5 +147,14 @@ export const patchUser = async (req,res)=>{
   res.json({
     success: true,
     data: user
+  });
+}
+
+export const isActive = async (req,res)=>{
+    const users = await isActive();
+    res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users
   });
 }

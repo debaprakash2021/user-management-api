@@ -1,4 +1,5 @@
 
+import { email } from "zod";
 import { users } from "../data/users.js";
 import User from "../models/user.js"
 export const deleteUserService = (id) => {
@@ -13,7 +14,7 @@ export const deleteUserService = (id) => {
 };
 
 export const getUsersService = async ()=>{
-    const users = await User.find();
+    const users = await User.find().sort({isActive:1});//sort by createdAt in descending order
     return users
 }
 
