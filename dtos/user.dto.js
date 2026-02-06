@@ -1,22 +1,43 @@
-export const validateCreateUser = (req, res, next) => {
-    console.log("USING DTO TO CHECK DATA VALIDATION");
+export const validateCreateUserDTO = (req, res, next) => {
+console.log("USING DTO TO CHECK DATA VALIDATION")
+  const { name, email } = req.body;
 
-    const { name, email, age } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({
+      success: false,
+      message: "Name and email are required"
+    });
+  }
 
-    if(!name || !email || !age){
-        return res.status(400).json({
-            success: false,
-            message: "Name , Email and Age are required"
+  next();
+};
 
-        });
-    }
-    else{
-        if(typeof name !== 'string' || typeof email !== 'string' || typeof age !== 'number'){
-            return res.status(400).json({
-                success: false,
-                message: "Invalid data types for name, email, or age"
-            });
-        }
-    }
-    next();
-}
+
+
+
+
+
+
+
+
+
+
+export const updateUserDTO = (req, res, next) => {
+  const { name, email } = req.body;
+
+  if (!name && !email) {
+    return res.status(400).json({
+      success: false,
+      message: "At least one field (name or email) is required"
+    });
+  }
+
+  if (email && !email.includes("@")) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format"
+    });
+  }
+
+  next();
+};

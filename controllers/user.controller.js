@@ -1,136 +1,151 @@
-import { users } from '../data/user.js';
-import { createUserService , deleteUserService} from '../services/user.services.js';
+
+import { users } from "../data/users.js";
+
+import { createUserService ,getUsersService ,updateUserService} from "../services/user.service.js";
 
 
-export const getUsers = (req, res) => {
-    const {token} = req.headers;
-    console.log("Token from header:", token);
-    try{
-        res.status(200).json({
-            success: true,
-            count: users.length,
-            data: users
-        });
-        
+
+export const getUsers = async (req, res) => {
+  // const {token} = req.headers
+  // console.log("req",req);
+  // console.log("token",token)
+
+  const users = await getUsersService();
+  console.log("getting users",users,typeof users);
+  res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users
+  });
+};
+
+// export const createUser = (req, res) => {
+//   try {
+//     const { name, email } = req.body;
+
+//     // // VALIDATION
+//     // if (!name || !email) {
+//     //   return res.status(400).json({
+//     //     success: false,
+//     //     message: "Name and email are required"
+//     //   });
+//     // }
+
+//     const newUser = {
+//       id: Date.now().toString(),
+//       name,
+//       email
+//     };
+
+//     users.push(newUser);
+
+//     res.status(201).json({
+//       success: true,
+//       data: newUser
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// };
+
+
+export const updateUser = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email } = req.body;
+
+    const user = users.find(u => u.id === id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
-    catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+
+    // PARTIAL UPDATE
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+//service code
+export const deleteUser = (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const index = users.findIndex(u => u.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
-}
+
+    users.splice(index, 1);
+
+    res.status(204).send();
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 
 
+
+// SERVICE LOGIC
+
+// export const deleteUser = (req, res) => {
+//   const deleted = deleteUserService(req.params.id);
+
+//   if (!deleted) {
+//     return res.status(404).json({
+//       success: false,
+//       message: "User not found"
+//     });
+//   }
+
+//   res.status(204).send();
+// };
 
 export const createUser = (req, res) => {
-    try{
-        const { name, age, email } = req.body;
-        const userBody = createUserService(name, email, age);
-        
-        if(!userBody.success){
-            return res.status(400).json({
-                 message: userBody.message
-                 });
-        }
-        const newUser = {
-            id: Date.now().toString(),
-            name,
-            age,
-            email
-        };
-        users.push(newUser); // Save the new user to the in-memory array
-        res.status(201).json({
-            message: "User created successfully",
-            data: newUser                                 
-        });
-    }
-    catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message        // Internal Server Error
-        });
-    }
+  const {email,name,password,role}=req.body;
+  
+  const userBody = createUserService(name,email,password,role);
+  
+  res.status(201).json({
+    success: true,
+    data: userBody
+  });
+};
+
+
+
+export const patchUser = async (req,res)=>{
+  const user = await updateUserService(req.params.id, req.body);
+
+  res.json({
+    success: true,
+    data: user
+  });
 }
-
-
-
-//delete user
-export const deleteUser = (req, res) => {
-    try{
-        const { id } = req.params;
-        const userIndex = users.findIndex(u => u.id === id);
-        if(userIndex === -1){
-            return res.status(404).json({
-                success: false,
-                message: "User Not Found"
-            });
-        }
-        users.splice(userIndex, 1);
-        res.status(204).send();
-
-    }
-    catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-}
-
-
-// update user
-export const updateUser = (req, res) => {
-    try{
-        const { id } = req.params;
-        const { name, age, email } = req.body;
-        const user = users.find(u => u.id === id);
-        if(!user){
-            return res.status(404).json({
-                success: false,
-                message: "User Not Found"
-            });
-        }
-        if(name) user.name = name;
-        if(age) user.age = age;
-        if(email) user.email = email;
-        res.status(200).json({
-            success: true,
-            message: "User Updated Successfully",
-            data: user
-        })
-    }
-    catch(error){
-        res.status(500).json({
-            success: false,
-            message: "User Not Found"
-        });
-    }
-}
-
-//getuser by id
-
-export const getUserById = (req, res) => {
-    try{
-        const { id } = req.params;
-        const user = users.find(u => u.id === id);
-        if(!user){
-            return res.status(404).json({
-                success: false,
-                message: "User Not Found"
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-    }
-    catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-}
-
