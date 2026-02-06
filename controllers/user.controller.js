@@ -1,7 +1,7 @@
 
 import { users } from "../data/users.js";
 
-import { createUserService ,getUsersService ,updateUserService} from "../services/user.service.js";
+import { createUserService ,getUsersService ,updateUserService , updateUserByEmailService} from "../services/user.service.js";
 
 
 
@@ -160,12 +160,13 @@ export const isActive = async (req,res)=>{
 }
 
 
-export const updateUserByEmail = async (req,res)=>{
-    const {email,updateUser} = req.body;
-    const user = await findByEmailAndUpdate(email, updateUser);  // Assuming email is unique and used to find the user to update
+export const updateUserByEmail = async (req, res) => {
+  const { email, updateUser } = req.body;
+
+  const user = await findByEmailAndUpdate(email, updateUser);
 
   res.json({
     success: true,
     data: user
   });
-}
+};

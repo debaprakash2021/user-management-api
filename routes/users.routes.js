@@ -19,8 +19,9 @@ const router = express.Router();
 router.get("/", getUsers);
 router.post("/", createUser);
 router.get("/isactive",isActive);
-router.patch("/:id",patchUser);
-router.patch("/byEmail",updateUserByEmail);
+router.patch("/byEmail", updateUserByEmail);
+router.patch("/:id", updateUser);
+
 router.delete("/:id", deleteUser);
 
 export default router;
