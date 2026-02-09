@@ -1,7 +1,13 @@
 
-import { users } from "../data/users.js";
-
-import { createUserService ,getUsersService ,updateUserService , updateUserByEmailService} from "../services/user.service.js";
+import { createUserService,
+        getUsersService ,
+        updateUserService , 
+        findByEmailAndUpdate,
+        deleteByEmail,
+        deleteUserService,
+        createPostService,
+        getPostService
+      } from "../services/user.service.js";
 
 
 
@@ -53,12 +59,12 @@ export const getUsers = async (req, res) => {
 // };
 
 
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email } = req.body;
+    const updateData = req.body;
 
-    const user = users.find(u => u.id === id);
+    const user = await updateUserService(id, updateData);
 
     if (!user) {
       return res.status(404).json({
@@ -66,10 +72,6 @@ export const updateUser = (req, res) => {
         message: "User not found"
       });
     }
-
-    // PARTIAL UPDATE
-    if (name) user.name = name;
-    if (email) user.email = email;
 
     res.status(200).json({
       success: true,
@@ -85,20 +87,18 @@ export const updateUser = (req, res) => {
 };
 
 //service code
-export const deleteUser = (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const index = users.findIndex(u => u.id === id);
+    const deleted = await deleteUserService(id);
 
-    if (index === -1) {
+    if (!deleted) {
       return res.status(404).json({
         success: false,
         message: "User not found"
       });
     }
-
-    users.splice(index, 1);
 
     res.status(204).send();
 
@@ -160,13 +160,72 @@ export const isActive = async (req,res)=>{
 }
 
 
-export const updateUserByEmail = async (req, res) => {
-  const { email, updateUser } = req.body;
+ export const updateUserByEmail = async (req, res) => {
+  const { email, updateData } = req.body;
 
-  const user = await findByEmailAndUpdate(email, updateUser);
+  const updatedUser = await findByEmailAndUpdate(email, updateData);
 
-  res.json({
+  res.status(200).json({
     success: true,
-    data: user
+    data: updatedUser
   });
 };
+
+
+export const deleteUserByEmail = async(req,res)=>{
+  const {email} = req.body;
+  // if mail does not exist in the input field
+  if(!email){
+    res.status(400).json({
+      success:false,
+      message:"Email is Required !"
+    })
+  } 
+    // now call the delete function from service folder
+    const deleteUser = await deleteByEmail(email);
+
+    if(deleteUser===false){
+      res.status(400).json({
+        success:false,
+        message:"User not found in Database"
+      })
+    }
+
+    res.status(200).json({
+      data:deleteUser,
+      success:true,
+      message:"User Deleted Successfully"
+    })
+
+}
+
+
+export const createPost = async (req,res)=>{
+  const {title,content,user} = req.body;
+  const postService = await createPostService(title,content,user);
+  if(!postService){
+    res.status(400).json({
+      success:false,
+      message:"Post not created"
+    })
+  }
+  res.status(201).json({
+    success:true,
+    data:postService
+  })
+
+}
+
+export const getPost = async (req,res)=>{
+  const postData = await getPostService();
+  if(!postData){
+    res.status(400).json({
+      success:false,
+      message:"Post not found"
+    })
+  }
+  res.status(200).json({
+    success:true,
+    data:postData
+  })
+}
